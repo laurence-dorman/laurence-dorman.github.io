@@ -4,7 +4,7 @@ title: Laurence Dorman
 description: programmer | game dev
 
 baseurl: #name of GitHub repository
-url: "" #custom url to be used instead of GitHub repository
+url: "laurence.fyi" #custom url to be used instead of GitHub repository
 email: dormanlaurence@gmail.com 
 
 # Pagination
