@@ -18,7 +18,7 @@ date: 2023-08-10
 
 ## [Introduction](#introduction)
 
-I came across a number of interesting interactive live AI projects online and decided that it would be fun to try and create my own. I wanted to create a live experience that would be entertaining and engaging for viewers, while also being "easy" to set up and run. 
+I came across a number of interesting live AI projects online that created interactive and believable "deepfakes" of well known figures/celebrities. I decided that it would be fun to try and create my own. I wanted to create a live experience that would be entertaining and engaging for viewers, while also being "easy" to set up and run. 
 
 The basic premise of the project is to [take questions from a live chat](#3-twitch-chat-bot), use an LLM to generate a response, and then use a [custom TTS model](#1-fine-tuning-the-tts-model) to read the response out loud. The response is then lip-synced to a video of a person speaking using [Wav2Lip](#2-installing-wav2lip). The final result is sent to an [RTMP server](#4-set-up-the-rtmp-server), then streamed to Twitch using OBS.
 
@@ -63,6 +63,8 @@ ffmpeg -i $DIR/raw/$name.wav -ss $ss -to $to -c copy -y $DIR/clips/$name.wav
 python split_silence.py $DIR/clips/$name.wav
 rm $DIR/raw/*
 ~~~
+
+> It's best to ensure that the audio downloaded contains only the target person speaking, and not any background noise/music or other people speaking, as this will impact the training. To help with this, you can use the -s and -t flags to specify the start and end time of the audio you want to download.
 
 The bash script then runs `split_silence.py`, passing it the filepath of the raw audio that we downloaded. It transcribes the audio using OpenAI's [Whisper](https://github.com/openai/whisper) and splits the audio into segments, by finding sections of silence. It's important to do this so the dataset will have clean sentences, and there isn't audio segments that start or end halfway through a word, this would impact the training. The audio segments are saved under the `wavs` directory, and the transcribed text, along with the name of the audio file, is saved in `metadata.csv`, which is the dataset we will use to train the TTS model:
 
@@ -177,17 +179,19 @@ We can now download the VITS model by generating a sample audio file:
 tts --text "This is a test sentence" --model_name "tts_models/en/ljspeech/vits" --outpath "test.wav"
 ```
 
-Now, we need to setup the model config for fine-tuning. The config needs information such as the formatter (in our case ljspeech), the dataset file (metadata.csv) and other variables which depend on the hardware you're using (batch_Size), and parameters that can be altered depending on how you want the model to be trained.
+Now, we need to setup the model config for fine-tuning. The config needs information such as the formatter (in our case ljspeech), the dataset file (metadata.csv) and other variables which depend on the hardware you're using (batch_size), and parameters that can be altered depending on how you want the model to be trained.
 
-Fortunately, someone has put together a [Google Colab note](https://colab.research.google.com/drive/1N_B_38MMRk1BUqwI_C829TyGpNmppUqK) which does a lot of these steps for us, which is very useful if you don't have the hardware necessary to train it yourself. I used this notebook to fine-tune the model, and the results were pretty good after a good few hours of training. However, ensure to keep an eye on the trainer output by listening to the audio samples generated on the tensorboard dashboard, once it sounds good enough, you can stop the training and download the model.
+Fortunately, someone has put together a [Google Colab note](https://colab.research.google.com/drive/1N_B_38MMRk1BUqwI_C829TyGpNmppUqK) which does a lot of these steps for us, which is very useful if you don't have the hardware necessary to train it yourself. I used this notebook to fine-tune the model, and the results were pretty good after a good few hours of training. 
+
+Ensure to keep an eye on the trainer output by listening to the audio samples generated on the tensorboard dashboard, once it sounds good enough, you can stop the training and download the model.
+
+Now that we have fine-tuned our custom TTS model, we can now move on to the next step.
 
 &nbsp;
 
 ***
 
 &nbsp;
-
-Congratulations, you now have a custom TTS model! We can now move on to the next step.
 
 ## [2. Installing Wav2Lip](#2-installing-wav2lip)
 
