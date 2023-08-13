@@ -42,6 +42,80 @@ The purpose of the application is:
 
 &nbsp;
 
+## Task-based farm
+
+The parallel part of my application uses the “farming” pattern, which is effective since it keeps all CPUs busy.
+
+~~~cpp
+void Farm::run()
+{
+	const int num_threads = std::thread::hardware_concurrency(); // function returns num of CPUs
+	std::vector<std::thread*> threads_vec;
+
+	std::mutex queue_mutex; // mutex protecting queue
+
+	for (int i = 0; i < num_threads; i++) {
+		threads_vec.push_back(new std::thread([&]
+			{
+				while (!queue_.empty()) {
+
+					if (queue_.front()) {
+						Task* task;
+						queue_mutex.lock();
+						task = queue_.front();
+
+						queue_.pop();
+
+						queue_mutex.unlock();
+						task->run();
+					}
+					
+				}
+			}));
+	}
+
+	for (std::thread* thread : threads_vec) {
+		thread->join();
+	}
+}
+~~~
+
+Each task will calculate the points in a row of the Mandelbrot set, then it will set the according pixels of the sf::Image object, which is passed as a pointer.
+
+~~~cpp
+while (abs(z) < 2.0 && iterations < iterations_)
+			{
+				z = (z * z) + c;
+				++iterations;
+			}
+...
+image_->setPixel(x, y, sf::Color::Black);
+~~~
+
+### Task-based farm results
+
+The task-based farm is very effective at keeping all CPUs busy, and therefore the Mandelbrot set is generated very quickly.
+
+Comparing the application running with 1 thread vs 4 threads using an i5 4690k (4 cores):
+
+- 1 thread median: 2404ms.
+- 4 threads median: 643ms.
+- Decrease ≈ 3.7x.
+
+[![UI](/assets/images/mandelbrot/graph.png)](/assets/images/mandelbrot/graph.png)
+
+These results show that my task-based farm is utilizing the 4 CPU cores well.
+
+Resource manager also shows all 4 CPU cores at 100% usage while the farm is running.
+
+[![UI](/assets/images/mandelbrot/resource-manager.png)](/assets/images/mandelbrot/resource-manager.png)
+
+&nbsp;
+
+***
+
+&nbsp;
+
 ## Conclusion
 
 > The full source code for this project can be found on [GitHub](https://github.com/laurence-dorman/Mandelbrot-SFML).
