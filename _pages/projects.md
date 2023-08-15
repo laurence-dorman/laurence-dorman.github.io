@@ -11,7 +11,8 @@ published: true
 	<div class="gallery">
 
 
-  {% for project in site.projects %}
+  {% assign sorted_projects = site.projects | sort: 'date' | reverse %}
+  {% for project in sorted_projects %}
 
   {% if project.redirect %}
   <div class="projectTile">
