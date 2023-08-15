@@ -102,13 +102,13 @@ Comparing the application running with 1 thread vs 4 threads using an i5 4690k (
 - 4 threads median: 643ms.
 - Decrease ≈ 3.7x.
 
-[![UI](/assets/images/mandelbrot/graph.png)](/assets/images/mandelbrot/graph.png)
+[![Graph](/assets/images/mandelbrot/graph.png)](/assets/images/mandelbrot/graph.png)
 
 These results show that my task-based farm is utilizing the 4 CPU cores well.
 
 Resource manager also shows all 4 CPU cores at 100% usage while the farm is running.
 
-[![UI](/assets/images/mandelbrot/resource-manager.png)](/assets/images/mandelbrot/resource-manager.png)
+[![Resource manager](/assets/images/mandelbrot/resource-manager.png)](/assets/images/mandelbrot/resource-manager.png)
 
 &nbsp;
 
