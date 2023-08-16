@@ -148,12 +148,17 @@ Parse the PGN file, extracting key information, and generate a GIF of the game.
 
 ~~~python
 def get_result(user, termination):
-    way_of = termination.split("won ")[1]
-    if termination.lower().find(user["chess_username"].lower()) != -1:
-        return (user["twitter_username"] + " won " + way_of)
+    if "drawn " in termination.lower():
+        return (user["twitter_username"] + " drew")
+    if "won " in termination.lower():
+        way_of = termination.split("won ")[1]
+        if user["chess_username"].lower() in termination.lower():
+            return (user["twitter_username"] + " won " + way_of)
+        else:
+            return (user["twitter_username"] + " lost " + way_of)
     else:
-        return (user["twitter_username"] + " lost " + way_of)
-
+        return (user["twitter_username"])
+...
 def new_game(game, user):
     reverse = False
     pgn = game["pgn"]
