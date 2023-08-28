@@ -280,7 +280,7 @@ chatClient.onMessage((channel, user, text) => {
 
 ### Commands
 
-> The custom classes for the commands aren't required for this project so I won't be going into detail about them here, but you more details in my [Twitch Chat Bot Project](/projects/twitch-chat-bot).
+> The custom classes for the commands aren't required for this project so I won't be going into detail about them here, but you can find more details in my [Twitch Chat Bot Project](/projects/twitch-chat-bot).
 
 The "ask" command:
 
